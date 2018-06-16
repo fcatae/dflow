@@ -18,4 +18,4 @@ workflow('wf1', () => {
 }, 1000)
 
 // phase 1: initialize
-runWorkflow('wf1');
+runWorkflow('wf1-phase2');

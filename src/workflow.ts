@@ -1,4 +1,5 @@
 // implementation
+var rootNamespace: CodeBlock;
 var current: CodeBlock;
 var worklist: {[name: string]: CodeBlock} = {};
 
@@ -16,25 +17,33 @@ export function code(name: string, func: Function, timeout?: number) : any {
     }
 
     if(!current.isReady) {
-        current.addBlock(name, func);
+        var block = new CodeBlock(name, func, timeout);
+        current.addBlock(name, block);
     } else {
         var codeBlock = current.getBlock(name);
-        codeBlock();
+        codeBlock.exec();
     }    
 }
 
-export function runWorkflow(name: string): any {
+export function runWorkflow(path: string): any {
+    var names = path.split('-', 2);
+        
+    var name = names[0];
+
     var workflow = worklist[name];
-    workflow.exec();
+
+    var block = workflow.getBlockRecursive(names[1]);
+
+    block.exec();
 }
 
 class CodeBlock {
     private name: string;
     private codeDefinition: Function;
-    private childBlocks?: {[name:string]: Function};
+    private childBlocks?: {[name:string]: CodeBlock};
     private _isReady: Boolean = false;
 
-    constructor(name: string, func: Function, timeout: number) {
+    constructor(name: string, func: Function, timeout?: number) {
         this.name = name;        
         this.codeDefinition = func;
     }
@@ -50,7 +59,7 @@ class CodeBlock {
         this.codeDefinition();
     }    
 
-    addBlock(name: string, block: Function) {
+    addBlock(name: string, block: CodeBlock) {
         this.childBlocks = this.childBlocks || {}
         if(this.childBlocks == undefined) {
             this.childBlocks = {}
@@ -60,12 +69,24 @@ class CodeBlock {
         }
         this.childBlocks[name] = block;
     }
-    
+
     getBlock(name: string) {
         if(this.childBlocks == undefined) {
             throw 'code block not initialized';
         }
             
         return this.childBlocks[name];
+    }
+
+    getBlockRecursive(path: string): CodeBlock {
+        var names = path.split('-', 2);
+
+        var block = this.getBlock(names[0]);
+
+        if( names.length > 1 ) {
+            return block.getBlockRecursive(names[1])
+        }
+
+        return block;
     }
 }
