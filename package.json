@@ -4,6 +4,7 @@
   "description": "",
   "main": "spec.js",
   "scripts": {
+    "start": "npm run build && node out/index",
     "build": "tsc",
     "watch": "tsc -w",
     "test": "echo \"Error: no test specified\" && exit 1"
