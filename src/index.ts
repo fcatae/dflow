@@ -1,4 +1,4 @@
-import { workflow, code, runWorkflow } from './workflow'
+import { workflow, code, getWorkflow } from './workflow'
 
 console.log('hello world')
 
@@ -20,5 +20,6 @@ workflow('wf1', () => {
 }, 1000)
 
 // phase 1: initialize
-runWorkflow('wf1'); // init
-runWorkflow('wf1'); // exec
+var wf1 = getWorkflow('wf1');
+wf1.init();
+wf1.exec();
