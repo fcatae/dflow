@@ -1,7 +1,8 @@
 export class CodeBlock {
     private name: string;
     private codeDefinition: Function;
-    private childBlocks?: {[name:string]: CodeBlock};
+    private indexBlocks: {[name:string]: CodeBlock} = {};
+    private listBlocks: CodeBlock[] = [];
     private _isReady: Boolean = false;
 
     static CreateRoot(name: string) {
@@ -20,27 +21,30 @@ export class CodeBlock {
         this._isReady = true;
     }
 
-    exec(): void {
-        this.codeDefinition();
+    initChildren(): void {
+        this.listBlocks.forEach( child => {
+            child.init();
+        });
     }    
 
+    exec(): void {
+        this.codeDefinition();
+    }
+    
     addBlock(name: string, block: CodeBlock) {
-        this.childBlocks = this.childBlocks || {}
-        if(this.childBlocks == undefined) {
-            this.childBlocks = {}
-        }
-        if(name in this.childBlocks) {
+        if(name in this.indexBlocks) {
             throw ('code block already defined: ' + name)
         }
-        this.childBlocks[name] = block;
+        this.listBlocks.push(block);
+        this.indexBlocks[name] = block;
     }
 
     getBlock(name: string) {
-        if(this.childBlocks == undefined) {
+        if(this.indexBlocks == undefined) {
             throw 'code block not initialized';
         }
             
-        return this.childBlocks[name];
+        return this.indexBlocks[name];
     }
 
     getBlockRecursive(path: string): CodeBlock {

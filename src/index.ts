@@ -15,7 +15,15 @@ workflow('wf1', () => {
         console.log("tecle 2 para confirmar ciencia sobre o problema")
     });
 
+    code('contagem', () => {
+        console.log('123')
+        code('a1', () => { console.log('1') });
+        code('a2', () => { console.log('2') });
+        code('a3', () => { console.log('3') });
+    });
+
 }, 1000)
 
 // phase 1: initialize
-runWorkflow('wf1-phase2');
+runWorkflow('wf1');
+runWorkflow('wf1');

@@ -18,13 +18,20 @@ export function code(name: string, func: Function, timeout?: number) : any {
         throw 'code block not defined'
     }
 
+    var oldFrame = current;
     if(!current.isReady) {
-        var block = new CodeBlock(name, func, timeout);
-        current.addBlock(name, block);
-    } else {
+        var codeBlock = new CodeBlock(name, func, timeout);
+        current.addBlock(name, codeBlock);
+
+        current = codeBlock;
+        codeBlock.init();
+    } else {                
         var codeBlock = current.getBlock(name);
-        codeBlock.exec();
+
+        current = codeBlock;
+        codeBlock.exec();        
     }    
+    current = oldFrame;
 }
 
 export function runWorkflow(path: string): any {
