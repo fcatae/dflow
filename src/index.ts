@@ -2,12 +2,16 @@ console.log('hello world')
 
 // implementation
 var workflows: {[name:string]: Function} = {}
+var codeblocks: {[name:string]: Function} = {}
+var current: any = {};
 
 function workflow(name: string, func: Function, timeout: number) : any {
     workflows[name] = func;
+    current.codeblocks = {}
 }
 
 function code(name: string, func: Function, timeout?: number) : any {
+    current.codeblocks[name] = func;
 }
 
 // sample code
@@ -28,4 +32,5 @@ workflow('wf1', () => {
 }, 1000)
 
 // phase 1: initialize
-workflows['wf1']();
+workflows['wf1'](); // init
+workflows['wf1'](); // exec
