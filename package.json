@@ -1,0 +1,15 @@
+{
+  "name": "umaflow",
+  "version": "1.0.0",
+  "description": "",
+  "main": "spec.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Fabricio Catae",
+  "devDependencies": {
+    "typescript": "^2.9.2"
+  }
+}
