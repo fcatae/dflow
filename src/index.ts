@@ -1,25 +1,21 @@
-import { workflow, code, getWorkflow } from './workflow'
+import { workflow, code, runWorkflow } from './workflow'
 
 console.log('hello world')
 
 // sample code
 workflow('wf1', () => {
 
-    console.log('wf1 started');
-    
     code('phase1', () => {
-        console.log("atencao, tivemos um incidente {incId} no dia de hoje")
-        console.log("tecle 1 para confirmar ciencia sobre o problema")
+        console.log("atencao")
+        console.log("tecle 1")
     });
 
     code('phase2', () => {
-        console.log("atencao novamente")
-        console.log("tecle 2")
+        console.log("atencao, tivemos um incidente {incId} no dia de hoje")
+        console.log("tecle 2 para confirmar ciencia sobre o problema")
     });
 
 }, 1000)
 
 // phase 1: initialize
-var wf1 = getWorkflow('wf1');
-wf1.init();
-wf1.exec();
+runWorkflow('wf1');

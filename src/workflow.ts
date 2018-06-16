@@ -1,41 +1,48 @@
 // implementation
 var current: any = {};
-var worklist: {[name: string]: Workflow} = {};
+var worklist: {[name: string]: CodeBlock} = {};
 
 export function workflow(name: string, func: Function, timeout: number) : any {
-    worklist[name] = new Workflow(name, func, timeout);
+    var workflow = new CodeBlock(name, func, timeout);
+    workflow.init();
+
+    worklist[name] = workflow;
 }
 
 export function code(name: string, func: Function, timeout?: number) : any {
     current.codeblocks = current.codeblocks || {}
 
-    if(name in current.codeblocks) {
+    var isReady = name in current.codeblocks;
+
+    if(!isReady) {
+        current.codeblocks[name] = func;
+    } else {
         var codeDefinition = current.codeblocks[name];
         codeDefinition();
-    } else {
-        current.codeblocks[name] = func;
     }    
 }
 
-export function getWorkflow(name: string): Workflow {
-    return worklist[name];
+export function runWorkflow(name: string): any {
+    var workflow = worklist[name];
+    workflow.exec();
 }
 
-export class Workflow {
+class CodeBlock {
     private name: string;
-    private workDefinition: Function;
-    private codeblocks: {[name:string]: Function}
+    private codeDefinition: Function;
+    private childBlocks?: {[name:string]: Function};
 
     constructor(name: string, func: Function, timeout: number) {
-        this.name = name;
-        this.workDefinition = func;
-        this.codeblocks = {};
+        this.name = name;        
+        this.codeDefinition = func;
     }
 
+    get isReady() { return this.childBlocks != undefined };
+
     init(): void {
-        this.workDefinition();
+        this.codeDefinition();
     }
     exec(): void {
-        this.workDefinition();
+        this.codeDefinition();
     }
 }
