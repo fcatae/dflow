@@ -12,9 +12,9 @@ workflow('wf1', () => {
         console.log("tecle 1 para confirmar ciencia sobre o problema")
     });
 
-    code('phase1', () => {
-        console.log("atencao, tivemos um incidente {incId} no dia de hoje")
-        console.log("tecle 1 para confirmar ciencia sobre o problema")
+    code('phase2', () => {
+        console.log("atencao novamente")
+        console.log("tecle 2")
     });
 
 }, 1000)

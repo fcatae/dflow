@@ -8,7 +8,13 @@ export function workflow(name: string, func: Function, timeout: number) : any {
 
 export function code(name: string, func: Function, timeout?: number) : any {
     current.codeblocks = current.codeblocks || {}
-    current.codeblocks[name] = func;
+
+    if(name in current.codeblocks) {
+        var codeDefinition = current.codeblocks[name];
+        codeDefinition();
+    } else {
+        current.codeblocks[name] = func;
+    }    
 }
 
 export function getWorkflow(name: string): Workflow {
