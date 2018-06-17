@@ -1,7 +1,7 @@
-import { code } from './workflow'
+import { code, workflow } from './workflow'
 
 // sample code
-var wf1 = code('wf1', () => {
+var wf1 = workflow('wf1', () => {
 
     code('contagem', (init_variables = [1, 2, 3]) => {
         var [a,b,c] = init_variables;
@@ -36,7 +36,4 @@ wf1.run();
 // p1.runStep();
 // p1.kill();
 
-// var step = wf1.runStep();
-// restartWorkflow('wf1-contagem-2', {});
-// step1 = start('wf1')
-// step2 = runStep(step1);
+wf1.run();

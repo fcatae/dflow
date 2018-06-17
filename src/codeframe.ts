@@ -1,22 +1,37 @@
 import { CodeBlock } from './codeblock';
+import { code } from './workflow';
 
 export class CodeFrame {
-    parent: CodeFrame
-
-    constructor(parent: CodeFrame) {
+    parent: CodeFrame | null
+    codeBlock: CodeBlock
+    private indexBlocks: {[name:string]: CodeBlock} = {};
+    
+    constructor(parent: CodeFrame | null, codeBlock: CodeBlock) {
         this.parent = parent;
+        this.codeBlock = codeBlock;
     }
 
-    code(name: string, func: Function, timeout?: number) : any {
-        var codeBlock = new CodeBlock(name, func, timeout);
-        
-        return {
-            run: () => codeBlock.exec()
+    exec(filter?: any) {
+        this.codeBlock.exec();
+    }
+
+    addBlock(name: string, block: CodeBlock) {
+        if(name in this.indexBlocks) {
+            throw ('code block already defined: ' + name)
         }
+        this.indexBlocks[name] = block;
+    }
+
+    getBlock(name: string) {
+        if(this.indexBlocks == undefined) {
+            throw 'code block not initialized';
+        }
+            
+        return this.indexBlocks[name];
     }
 }
 
-export class ContextExecution {
+export class ExecutionContext {
     currentFrame: CodeFrame | null;
     name: string;    
     
@@ -35,20 +50,24 @@ export class ContextExecution {
         }
         return <CodeFrame>this.currentFrame;
     }
-    
-    exec(codeBlock: CodeBlock) {
+
+    start(codeBlock: CodeBlock, filter?: any) {
+        var parentContext= <CodeFrame>this.currentFrame;
+        var childContext = new CodeFrame(parentContext, codeBlock);
+
+        this.setCurrent(childContext);
+        try {
+            childContext.exec(filter); 
+        }
+        finally{
+            this.setCurrent(parentContext);
+        }
+    }
+
+    exec(codeBlock: CodeBlock, filter?: any) {
         if( this.currentFrame == null ) {
             throw 'invalid current fame';
         }
-        var oldContext= <CodeFrame>this.currentFrame;
-        var newContext = new CodeFrame(oldContext);
-
-        this.setCurrent(newContext);
-        try {
-            codeBlock.exec();    
-        }
-        finally{
-            this.setCurrent(oldContext);
-        }
+        this.start(codeBlock, filter);
     }
 }
