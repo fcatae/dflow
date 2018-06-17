@@ -4,9 +4,7 @@ import { CodeBlock } from './codeblock';
 var execCtx: ExecutionContext = new ExecutionContext('root');
 
 function assertValidContext(execCtx?: ExecutionContext) {
-    if(execCtx == null) {
-        throw 'namespace not defined'
-    } 
+    if(execCtx == null) throw 'namespace not defined';
 }
 
 export function code(name: string, func: Function, options: { timeout?:number } = {}) : any {
