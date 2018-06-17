@@ -6,7 +6,9 @@ export class CodeBlock {
     private _isReady: Boolean = false;
 
     static CreateRoot(name: string) {
-        return new CodeBlock(name, ()=>{});
+        var namespace = new CodeBlock(name, ()=>{});
+        namespace._isReady = true;
+        return namespace;
     }
     
     constructor(name: string, func: Function, timeout?: number) {
