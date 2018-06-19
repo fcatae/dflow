@@ -4,7 +4,6 @@ import { code } from './workflow';
 export class CodeFrame {
     parent: CodeFrame | null
     codeBlock: CodeBlock
-    private indexBlocks: {[name:string]: CodeBlock} = {};
     
     constructor(parent: CodeFrame | null, codeBlock: CodeBlock) {
         this.parent = parent;
@@ -13,21 +12,6 @@ export class CodeFrame {
 
     exec(filter?: any) {
         this.codeBlock.exec();
-    }
-
-    addBlock(name: string, block: CodeBlock) {
-        if(name in this.indexBlocks) {
-            throw ('code block already defined: ' + name)
-        }
-        this.indexBlocks[name] = block;
-    }
-
-    getBlock(name: string) {
-        if(this.indexBlocks == undefined) {
-            throw 'code block not initialized';
-        }
-            
-        return this.indexBlocks[name];
     }
 }
 
@@ -48,11 +32,25 @@ export class ExecutionContext {
         if(this.currentFrame == null) {
             throw 'invalid current fame';
         }
-        return <CodeFrame>this.currentFrame;
+        return this.currentFrame as CodeFrame;
     }
 
     start(codeBlock: CodeBlock, filter?: any) {
-        var parentContext= <CodeFrame>this.currentFrame;
+        if( this.currentFrame != null ) {
+            throw 'invalid current fame: code already running';
+        }
+        this.execInContext(codeBlock, filter);
+    }
+
+    exec(codeBlock: CodeBlock, filter?: any) {
+        if( this.currentFrame == null ) {
+            throw 'invalid current fame';
+        }
+        this.execInContext(codeBlock, filter);
+    }
+
+    private execInContext(codeBlock: CodeBlock, filter?: any) {
+        var parentContext= this.currentFrame as CodeFrame;
         var childContext = new CodeFrame(parentContext, codeBlock);
 
         this.setCurrent(childContext);
@@ -62,12 +60,5 @@ export class ExecutionContext {
         finally{
             this.setCurrent(parentContext);
         }
-    }
-
-    exec(codeBlock: CodeBlock, filter?: any) {
-        if( this.currentFrame == null ) {
-            throw 'invalid current fame';
-        }
-        this.start(codeBlock, filter);
     }
 }

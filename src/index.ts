@@ -9,7 +9,7 @@ var wf1 = workflow('wf1', () => {
         code('a1', () => { console.log(a); a++; });
         code('a2', () => { console.log(a); a++; });
         code('a3', () => { console.log(a); a++; });
-        code('fim', () => { console.log(a+b+c); });
+        code('fim', () => { console.log('soma: ' + a+b+c); });
     });
 
     code('phase1', () => {
