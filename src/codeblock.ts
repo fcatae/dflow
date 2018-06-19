@@ -1,5 +1,5 @@
 export class CodeBlock {
-    private name: string;
+    name: string;
     private codeDefinition: Function;
 
     constructor(name: string, func: Function, timeout?: number) {

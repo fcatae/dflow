@@ -4,21 +4,26 @@ import { code } from './workflow';
 export class CodeFrame {
     parent: CodeFrame | null
     codeBlock: CodeBlock
+    path: string;
     
     constructor(parent: CodeFrame | null, codeBlock: CodeBlock) {
         this.parent = parent;
         this.codeBlock = codeBlock;
+        this.path = (parent != null ? parent.path + '-' : '') + codeBlock.name;
     }
 
     exec(filter?: any) {
-        this.codeBlock.exec();
+        if((filter == null) || filter(this.path)) {
+            this.codeBlock.exec();
+        }
     }
 }
 
 export class ExecutionContext {
     currentFrame: CodeFrame | null;
     name: string;    
-    
+    private filter: any;
+
     constructor(name: string) {
         this.name = name;
         this.currentFrame = null;
@@ -39,23 +44,24 @@ export class ExecutionContext {
         if( this.currentFrame != null ) {
             throw 'invalid current fame: code already running';
         }
-        this.execInContext(codeBlock, filter);
+        this.filter = filter;        
+        this.execInContext(codeBlock);
     }
 
-    exec(codeBlock: CodeBlock, filter?: any) {
+    exec(codeBlock: CodeBlock) {
         if( this.currentFrame == null ) {
             throw 'invalid current fame';
         }
-        this.execInContext(codeBlock, filter);
+        this.execInContext(codeBlock);
     }
 
-    private execInContext(codeBlock: CodeBlock, filter?: any) {
+    private execInContext(codeBlock: CodeBlock) {
         var parentContext= this.currentFrame as CodeFrame;
         var childContext = new CodeFrame(parentContext, codeBlock);
 
         this.setCurrent(childContext);
         try {
-            childContext.exec(filter); 
+            childContext.exec(this.filter); 
         }
         finally{
             this.setCurrent(parentContext);

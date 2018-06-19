@@ -16,7 +16,7 @@ export function code(name: string, func: Function, options: { timeout?:number } 
     execCtx.exec(codeBlock);
 }
 
-export function workflow(name: string, func: Function, options: { timeout?:number } = {}) : any {
+export function workflow(name: string, func: Function, options: { timeout?:number } = {}) : Workflow {
     assertValidContext(execCtx);
 
     return new Workflow(name, func, options);
@@ -39,5 +39,13 @@ export class Workflow {
         var codeBlock = new CodeBlock(this.name, this.func, this.options.timeout);
 
         execCtx.start(codeBlock);
+    }
+
+    runStep() {
+        execCtx = new ExecutionContext('root');
+
+        var codeBlock = new CodeBlock(this.name, this.func, this.options.timeout);
+
+        execCtx.start(codeBlock, (path:string) => { console.log(path); return true; });
     }
 }

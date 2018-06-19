@@ -26,7 +26,8 @@ var wf1 = workflow('wf1', () => {
 
 }, { timeout: 1000 })
 
-wf1.run();
+// wf1.run();
+wf1.runStep();
 
 // var processor;
 // var p1 = processor.run(wf1)
