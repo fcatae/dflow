@@ -1,10 +1,10 @@
-import { code, workflow } from './workflow'
+import { workflow } from './workflow'
 
 // sample code
-var wf1 = workflow('wf1', () => {
+var wf1 = workflow('wf1', (code: any) => {
 
-    code('contagem', (init_variables = [1, 2, 3]) => {
-        var [a,b,c] = init_variables;
+    code('contagem', () => {
+        var [a,b,c] = [1, 2, 3];
 
         code('a1', () => { console.log(a); a++; });
         code('a2', () => { console.log(a); a++; });

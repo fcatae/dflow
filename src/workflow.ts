@@ -7,7 +7,7 @@ function assertValidContext(execCtx?: ExecutionContext) {
     if(execCtx == null) throw 'namespace not defined';
 }
 
-export function code(name: string, func: Function, options: { timeout?:number } = {}) : any {
+export function code2(name: string, func: Function, options: { timeout?:number } = {}) : any {
     assertValidContext(globalExecCtx);
 
     var codeBlock = new CodeBlock(name, func, options.timeout);
@@ -51,13 +51,11 @@ export class Workflow {
         this.state = new WorkflowState(name);
         this.codeBlock = new CodeBlock(name, func, options.timeout);
     }
-
+    
     run() {
-        var execCtx = new ExecutionContext();
-
-        execCtx.start(this.codeBlock);
+        var execCtx = ExecutionContext.create(this.codeBlock);
     }
-
+        
     runStep(state: WorkflowState | null = null): WorkflowState {
 
         if(state == WorkflowState.Done) {
@@ -71,7 +69,7 @@ export class Workflow {
         var initialState = state || new WorkflowState(this.name);
         var nextState: WorkflowState = WorkflowState.Done;
 
-        execCtx.start(this.codeBlock, (path:string) => { 
+        ExecutionContext.create(this.codeBlock, (path:string) => { 
             if(pendingExecution) {
                 if(initialState.isBeforeExecution(path)) {
                     return true;

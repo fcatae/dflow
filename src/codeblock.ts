@@ -7,7 +7,7 @@ export class CodeBlock {
         this.codeDefinition = func;
     }
 
-    exec(): void {
-        this.codeDefinition();
+    exec(param: any): void {
+        this.codeDefinition(param);
     }
 }
