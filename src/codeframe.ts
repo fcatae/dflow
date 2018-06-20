@@ -20,12 +20,13 @@ export class CodeFrame {
 }
 
 export class ExecutionContext {
+    private static globalInstanceId = 0;
     currentFrame: CodeFrame | null;
     name: string;    
     private filter: any;
 
-    constructor(name: string) {
-        this.name = name;
+    constructor() {
+        this.name = (++ExecutionContext.globalInstanceId).toString();
         this.currentFrame = null;
     }
     

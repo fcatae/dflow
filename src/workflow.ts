@@ -1,24 +1,22 @@
 import { ExecutionContext, CodeFrame } from './codeframe';
 import { CodeBlock } from './codeblock';
 
-var execCtx: ExecutionContext = new ExecutionContext('root');
+var globalExecCtx: ExecutionContext = new ExecutionContext();
 
 function assertValidContext(execCtx?: ExecutionContext) {
     if(execCtx == null) throw 'namespace not defined';
 }
 
 export function code(name: string, func: Function, options: { timeout?:number } = {}) : any {
-    assertValidContext(execCtx);
+    assertValidContext(globalExecCtx);
 
     var codeBlock = new CodeBlock(name, func, options.timeout);
 
     // execute in the appropriate context
-    execCtx.exec(codeBlock);
+    globalExecCtx.exec(codeBlock);
 }
 
 export function workflow(name: string, func: Function, options: { timeout?:number } = {}) : Workflow {
-    assertValidContext(execCtx);
-
     return new Workflow(name, func, options);
 }
 
@@ -44,20 +42,20 @@ export class Workflow {
     func: Function;
     options: { timeout?:number };
     private state: WorkflowState | null;
+    private codeBlock: CodeBlock;
 
     constructor(name: string, func: Function, options: { timeout?:number } = {}) {
         this.name = name;
         this.func = func;
         this.options = options;
         this.state = new WorkflowState(name);
+        this.codeBlock = new CodeBlock(name, func, options.timeout);
     }
 
     run() {
-        execCtx = new ExecutionContext('root');
+        var execCtx = new ExecutionContext();
 
-        var codeBlock = new CodeBlock(this.name, this.func, this.options.timeout);
-
-        execCtx.start(codeBlock);
+        execCtx.start(this.codeBlock);
     }
 
     runStep(state: WorkflowState | null = null): WorkflowState {
@@ -66,16 +64,14 @@ export class Workflow {
             return WorkflowState.Done;
         }
         
-        execCtx = new ExecutionContext('root');
-
-        var codeBlock = new CodeBlock(this.name, this.func, this.options.timeout);
+        var execCtx = new ExecutionContext();
 
         var pendingExecution = true;
         var pendingSetLastState = true;
         var initialState = state || new WorkflowState(this.name);
         var nextState: WorkflowState = WorkflowState.Done;
 
-        execCtx.start(codeBlock, (path:string) => { 
+        execCtx.start(this.codeBlock, (path:string) => { 
             if(pendingExecution) {
                 if(initialState.isBeforeExecution(path)) {
                     return true;
