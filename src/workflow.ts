@@ -20,12 +20,15 @@ export function workflow(name: string, func: Function, options: { timeout?:numbe
     return new Workflow(name, func, options);
 }
 
-class WorkflowState {
-    static Done= new WorkflowState('$done')
+export class WorkflowState {
+    static Done= new WorkflowState('$done', [])
 
     path: string
-    constructor(path: string) {
+    variables: Array<any>
+    
+    constructor(path: string, localVariables: Array<any>) {
         this.path = path;
+        this.variables = localVariables;
     }
 
     isBeforeExecution(path: string) {
@@ -48,12 +51,13 @@ export class Workflow {
         this.name = name;
         this.func = func;
         this.options = options;
-        this.state = new WorkflowState(name);
+        this.state = new WorkflowState(name, []);
         this.codeBlock = new CodeBlock(name, func, options.timeout);
     }
     
     run() {
-        var execCtx = ExecutionContext.create(this.codeBlock);
+        var execCtx = new ExecutionContext();
+        execCtx.startCode(this.codeBlock);
     }
         
     runStep(state: WorkflowState | null = null): WorkflowState {
@@ -61,15 +65,14 @@ export class Workflow {
         if(state == WorkflowState.Done) {
             return WorkflowState.Done;
         }
-        
-        var execCtx = new ExecutionContext();
-
         var pendingExecution = true;
         var pendingSetLastState = true;
-        var initialState = state || new WorkflowState(this.name);
+        var initialState = state || new WorkflowState(this.name, []);
         var nextState: WorkflowState = WorkflowState.Done;
 
-        ExecutionContext.create(this.codeBlock, (path:string) => { 
+        var execCtx = new ExecutionContext(initialState);
+
+        execCtx.startCode(this.codeBlock, (path:string, frame: CodeFrame) => { 
             if(pendingExecution) {
                 if(initialState.isBeforeExecution(path)) {
                     return true;
@@ -81,13 +84,14 @@ export class Workflow {
                     return false;
                 }
                 
-                this.setCurrentState(path);
+                this.setCurrentState(execCtx, initialState);
                 pendingExecution = false;
                 return true;
             }
             
             if(pendingSetLastState) {
-                nextState = new WorkflowState(path);
+                var stackVariables = frame.getStackVariables();
+                nextState = new WorkflowState(path, stackVariables);
                 pendingSetLastState = false;
             }
 
@@ -97,9 +101,12 @@ export class Workflow {
         return nextState;
     }
 
-    private setCurrentState(path: string) {        
-        console.log('current execution: ' + path);
-        this.state = new WorkflowState(path);
+    private setCurrentState(execCtx: ExecutionContext, state: WorkflowState | null) {        
+        this.state = state;
+        if( state != null ) {
+            console.log('current execution: ' + state.path);
+            execCtx.restoreState = state;
+        }
     }
 
     getState() {

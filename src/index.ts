@@ -3,14 +3,13 @@ import { workflow } from './workflow'
 // sample code
 var wf1 = workflow('wf1', (code: any) => {
 
-    code('contagem', () => {
-        var [a,b,c] = [1, 2, 3];
-
-        code('a1', () => { console.log(a); a++; });
-        code('a2', () => { console.log(a); a++; });
-        code('a3', () => { console.log(a); a++; });
-        code('fim', () => { console.log('soma: ' + a+b+c); });
-    });
+    code('contagem', (v: any) => {
+        code('a1', () => { console.log(v.a); 
+            v.a++; });
+        code('a2', () => { console.log(v.a); v.a++; });
+        code('a3', () => { console.log(v.a); v.a++; });
+        code('fim', () => { console.log('soma: ' + v.a + v.b + v.c); });
+    }, { timeout: 1000 }, {a: 1, b: 2, c: 3});
 
     code('phase1', () => {
         console.log("atencao")
