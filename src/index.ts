@@ -1,7 +1,7 @@
 import { workflow } from './workflow'
 import { Bot } from './bot'
 
-var bot = new Bot(['yes', 'ok']);
+var bot = new Bot(['yes', '1', 'oi?']);
 
 // sample code
 var wf1 = workflow('wf1', (code: any) => {
@@ -19,11 +19,16 @@ var wf1 = workflow('wf1', (code: any) => {
     }, { timeout: 1000 });
 
     code('phase1', () => {
-        bot.send("atencao")
-        bot.send("tecle 1")
+        bot.send("atencao");
+
+        var digi = '';
+        while(digi != '1') {
+            bot.send("tecle 1");
+            digi = bot.recv();
+        }
+
     });
 
-    // if(digi != 1) goto('phase1')
 
     code('phase2', () => {
         bot.send("atencao, tivemos um incidente {incId} no dia de hoje")
