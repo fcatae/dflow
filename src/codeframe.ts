@@ -73,9 +73,21 @@ export class ExecutionContext {
             throw 'invalid current fame: code already running';
         }
         
-        var codeFunction = ((name: string, func: Function, options: { timeout?:number } = {}) : any => {
+        var codeFunction = ((name: string, func: Function, options: { timeout?:number, retry?:number } = {}) : any => {
             var codeBlock = new CodeBlock(name, func, options.timeout);
-            this.exec(codeBlock);
+            var retryNumber = options.retry || 0;
+            
+            if( retryNumber == 0 ) {
+                this.exec(codeBlock);
+            } else {
+                while(retryNumber > 0) {
+                    try { this.exec(codeBlock); break; } catch {
+                        console.log('retry')
+                    }
+                    retryNumber--;
+                }
+            }
+            
         });
 
         this.filter = filter;        

@@ -3,10 +3,27 @@ import { Bot } from './bot'
 
 var bot = new Bot(['yes', '1', 'oi?']);
 
+function randomFailure(rate: number) {
+    var rnd = Math.random();
+    if(rnd < rate) throw 'random failure';
+}
+
 // sample code
 var wf1 = workflow('wf1', (code: any) => {
 
     code('contagem', (vars: any) => {
+        code('init', ()=>{
+            vars.i = 1;
+        })
+        code('for', ()=>{
+            for(; vars.i<10; vars.i++) {
+                randomFailure(0.3);
+                bot.send('message: ' + vars.i);
+            }
+        }, {retry: 5})
+    });
+
+    code('contagem2', (vars: any) => {
         code('init', ()=> {
             vars.a = 1;
             vars.b = 2;
