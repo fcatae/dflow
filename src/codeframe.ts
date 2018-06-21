@@ -73,10 +73,9 @@ export class ExecutionContext {
             throw 'invalid current fame: code already running';
         }
         
-        var codeFunction = ((name: string, func: Function, options: { timeout?:number } = {}, param?: any) : any => {
+        var codeFunction = ((name: string, func: Function, options: { timeout?:number } = {}) : any => {
             var codeBlock = new CodeBlock(name, func, options.timeout);
-
-            this.exec(codeBlock, param);
+            this.exec(codeBlock);
         });
 
         this.filter = filter;        
@@ -102,11 +101,11 @@ export class ExecutionContext {
         this.startInContext(codeBlock, param);
     }
 
-    exec(codeBlock: CodeBlock, param?: any) {
+    exec(codeBlock: CodeBlock) {
         if( this.currentFrame == null ) {
             throw 'invalid current fame';
         }
-        this.execInContext(codeBlock, param);
+        this.execInContext(codeBlock);
     }    
 
     private startInContext(codeBlock: CodeBlock, param: any) {
@@ -124,7 +123,9 @@ export class ExecutionContext {
         }
     }
 
-    private execInContext(codeBlock: CodeBlock, param?: any) {
+    private execInContext(codeBlock: CodeBlock) {
+        var param = {};
+        
         if( this.restoreState != null ) {
             var variables = this.restoreState.variables;
             var index = variables.length - this.nesting - 1;
