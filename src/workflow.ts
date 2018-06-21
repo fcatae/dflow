@@ -104,7 +104,6 @@ export class Workflow {
     private setCurrentState(execCtx: ExecutionContext, state: WorkflowState | null) {        
         this.state = state;
         if( state != null ) {
-            console.log('current execution: ' + state.path);
             execCtx.restoreState = state;
         }
     }
